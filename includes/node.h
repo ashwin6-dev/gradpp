@@ -6,5 +6,5 @@ protected:
     std::vector<Node*> dependencies;
 
 public:
-    virtual std::vector<double> evaluate();
+    virtual double evaluate();
 };

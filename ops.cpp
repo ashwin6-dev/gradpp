@@ -10,14 +10,9 @@ BinOp::BinOp(Node* left, Node* right)
     dependencies.push_back(right);
 }
 
-std::vector<double> Add::evaluate()
+double Add::evaluate()
 {
-    std::vector<double> left_result = left->evaluate();
-    std::vector<double> right_result = right->evaluate();
-
-    assert(left_result.size() == 1 && right_result.size() == 1);
-
-    return std::vector<double> { left_result[0] + right_result[0] };
+    return left->evaluate() + right->evaluate();
 }
 
 Add add(Node* left, Node* right)

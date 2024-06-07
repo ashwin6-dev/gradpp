@@ -1,21 +1,27 @@
 #include <iostream>
-#include "includes/variable.h"
+#include "includes/graph.h"
 #include "includes/ops.h"
-#include "includes/node-collection.h"
+#include "includes/placeholder.h"
 
 int main()
 {
-    Variable v1 = make_variable(10.0);
-    Variable v2 = make_variable(10.0);
-    Variable v3 = make_variable(5.0);
-    Add a1 = add(&v1, &v2);
-    Add a2 = add(&a1, &v3);
-    
-    NodeCollection c = make_collection(
+    Placeholder p1 = make_placeholder();
+    Placeholder p2 = make_placeholder();
+
+    Graph g = make_graph(
+        std::vector<Placeholder*>{ &p1, &p2 }
+    );
+
+    Add a1 = add(&p1, &p2);
+    Add a2 = add(&p1, &a1);
+
+    g.set_outputs(
         std::vector<Node*> { &a1, &a2 }
     );
 
-    std::vector<double> result = (&c)->evaluate();
+    std::vector<double> result = g.evaluate(
+        std::vector<double> { 15.0, 20.0 }
+    );
 
     std::cout << result[0] << std::endl;
     std::cout << result[1] << std::endl;

@@ -14,7 +14,7 @@ public:
 class Add : public BinOp {
 public:
     Add(Node* left, Node* right) : BinOp(left, right) {};
-    std::vector<double> evaluate();
+    double evaluate();
 };
 
 
