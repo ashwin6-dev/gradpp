@@ -3,6 +3,7 @@
 #include "node.h"
 
 class BinOp : public Node {
+protected:
     Node* left;
     Node* right;
 
@@ -13,7 +14,7 @@ public:
 class Add : public BinOp {
 public:
     Add(Node* left, Node* right) : BinOp(left, right) {};
-    void accept(Visitor* visitor);
+    std::vector<double> evaluate();
 };
 
 

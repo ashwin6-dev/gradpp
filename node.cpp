@@ -1,11 +1,6 @@
 #include "includes/node.h"
 
-void Node::accept(Visitor* visitor)
+std::vector<double> Node::evaluate()
 {
-    visitor->visit(this);
-}
-
-void Visitor::visit(Node* node)
-{
-    return;
+    return std::vector<double>();
 }

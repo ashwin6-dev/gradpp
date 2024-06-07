@@ -5,9 +5,9 @@ Variable::Variable(double value)
     this->value = value;
 }
 
-void Variable::accept(Visitor* visitor)
+std::vector<double> Variable::evaluate()
 {
-    visitor->visit(this);
+    return std::vector<double> { value };
 }
 
 Variable make_variable(double value)

@@ -1,4 +1,6 @@
 #include "includes/ops.h"
+#include <cassert>
+#include <iostream>
 
 BinOp::BinOp(Node* left, Node* right) 
 {
@@ -8,9 +10,14 @@ BinOp::BinOp(Node* left, Node* right)
     dependencies.push_back(right);
 }
 
-void Add::accept(Visitor* visitor)
+std::vector<double> Add::evaluate()
 {
-    return visitor->visit(this);
+    std::vector<double> left_result = left->evaluate();
+    std::vector<double> right_result = right->evaluate();
+
+    assert(left_result.size() == 1 && right_result.size() == 1);
+
+    return std::vector<double> { left_result[0] + right_result[0] };
 }
 
 Add add(Node* left, Node* right)

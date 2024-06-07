@@ -5,9 +5,9 @@ Const::Const(double value)
     this->value = value;
 }
 
-void Const::accept(Visitor* visitor)
+std::vector<double> Const::evaluate()
 {
-    visitor->visit(this);
+    return std::vector<double> { value };
 }
 
 Const make_const(double value)

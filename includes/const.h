@@ -6,7 +6,7 @@ class Const : public Node {
 
 public:
     Const(double value);
-    void accept(Visitor* visitor);
+    std::vector<double> evaluate();
 };
 
 Const make_const(double variable);

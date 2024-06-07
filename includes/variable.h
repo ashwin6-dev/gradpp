@@ -6,7 +6,7 @@ class Variable : public Node {
 
 public:
     Variable(double value);
-    void accept(Visitor* visitor);
+    std::vector<double> evaluate();
 };
 
 Variable make_variable(double variable);
