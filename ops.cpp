@@ -15,7 +15,20 @@ double Add::evaluate()
     return left->evaluate() + right->evaluate();
 }
 
-Add add(Node* left, Node* right)
+Node* Add::partial(Node* incoming_gradient, Node* wrt)
 {
-    return Add(left, right);
+    if (this==wrt)
+        return incoming_gradient;
+
+    Node* left_partial = left->partial(incoming_gradient, wrt);
+
+    if (left_partial != nullptr)
+        return left_partial;
+
+    return right->partial(incoming_gradient, wrt);
+}
+
+Add* add(Node* left, Node* right)
+{
+    return new Add(left, right);
 }

@@ -10,8 +10,8 @@ double Placeholder::evaluate()
     return value;
 }
 
-Placeholder make_placeholder()
+Placeholder* make_placeholder()
 {
-    Placeholder p;
+    Placeholder* p = new Placeholder;
     return p;
 }

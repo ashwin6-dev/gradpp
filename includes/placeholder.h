@@ -10,4 +10,4 @@ public:
 };
 
 
-Placeholder make_placeholder();
+Placeholder* make_placeholder();

@@ -10,7 +10,12 @@ double Const::evaluate()
     return value;
 }
 
-Const make_const(double value)
+Node* Const::partial(Node* incoming_gradient, Node* wrt)
 {
-    return Const(value);
+    return nullptr;
+}
+
+Const* make_const(double value)
+{
+    return new Const(value);
 }

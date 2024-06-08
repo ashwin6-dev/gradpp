@@ -15,7 +15,8 @@ class Add : public BinOp {
 public:
     Add(Node* left, Node* right) : BinOp(left, right) {};
     double evaluate();
+    Node* partial(Node* incoming_gradient, Node* wrt);
 };
 
 
-Add add(Node* left, Node* right);
+Add* add(Node* left, Node* right);
