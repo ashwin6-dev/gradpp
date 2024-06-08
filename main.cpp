@@ -14,20 +14,29 @@ int main()
     );
 
     Add* a1 = add(p1, p2);
-    Add* a2 = add(p1, a1);
+    Node* a2 = mul(p1, a1);
 
     g.set_outputs(
-        std::vector<Node*> { a1 }
+        std::vector<Node*> { a2 }
     );
 
-    Graph grad_graph = g.partials();
+    Graph d1 = g.partials();
 
-    std::vector<double> result = grad_graph.evaluate(
+    std::vector<double> result = d1.evaluate(
         std::vector<double> { 15.0, 20.0 }
     );
 
     std::cout << result[0] << std::endl;
     std::cout << result[1] << std::endl;
+
+    Graph d2 = d1.partials();
+
+    std::vector<double> result2 = d2.evaluate(
+        std::vector<double> { 15.0, 20.0 }
+    );
+
+    std::cout << result2[0] << std::endl;
+    std::cout << result2[1] << std::endl;
 
     return 0;
 }

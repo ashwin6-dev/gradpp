@@ -32,9 +32,6 @@ std::vector<double> Graph::evaluate(std::vector<double> inputs)
     int num_outputs = outputs.size();
 
     for (Node* output : outputs) {
-        if (output == nullptr)
-            std::cout<<"dsndsn"<<std::endl;
-
         results.push_back(output->evaluate());
     }
 
@@ -47,15 +44,10 @@ Graph Graph::partials()
     std::vector<Node*> grad_outputs;    
 
     for (Placeholder* placeholder : placeholders) {
-        Node* partial_output = nullptr;
+        Node* partial_output = make_const(0.0);
         for (Node* output : outputs) {
             Node* partial = output->partial(c, placeholder);
-            
-            if (partial_output != nullptr) {
-                partial_output = add(partial_output, partial);
-            }else {
-                partial_output = partial;
-            }
+            partial_output = add(partial_output, partial);
         }
 
         grad_outputs.push_back(partial_output);
