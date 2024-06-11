@@ -55,8 +55,52 @@ uint8_t* sub_doubles(Register source, Register dest)
     return code;
 }
 
+uint8_t* mul_doubles(Register source, Register dest)
+{
+    uint8_t prefix = 0xf2;
+    uint8_t opcode_prefix = 0x0f;
+    uint8_t opcode = 0x59;
+    uint8_t operands = (dest << 3) | source;
+    uint8_t mod = 3 << 6;
+
+    uint8_t* code = (uint8_t*) calloc(5, sizeof(uint8_t));
+    if (!code) {
+        return nullptr; // Handle allocation failure
+    }
+
+    code[0] = prefix;
+    code[1] = opcode_prefix;
+    code[2] = opcode;
+    code[3] = mod | operands;
+    code[4] = 0xc3;
+
+    return code;
+}
+
+uint8_t* div_doubles(Register source, Register dest)
+{
+    uint8_t prefix = 0xf2;
+    uint8_t opcode_prefix = 0x0f;
+    uint8_t opcode = 0x5e;
+    uint8_t operands = (dest << 3) | source;
+    uint8_t mod = 3 << 6;
+
+    uint8_t* code = (uint8_t*) calloc(5, sizeof(uint8_t));
+    if (!code) {
+        return nullptr; // Handle allocation failure
+    }
+
+    code[0] = prefix;
+    code[1] = opcode_prefix;
+    code[2] = opcode;
+    code[3] = mod | operands;
+    code[4] = 0xc3;
+
+    return code;
+}
+
 int main() {
-    uint8_t* code = sub_doubles(XMM1, XMM0);
+    uint8_t* code = div_doubles(XMM1, XMM0);
 
     if (!code) {
         return 1; // Handle allocation failure
@@ -82,7 +126,7 @@ int main() {
     func_t add_func = reinterpret_cast<func_t>(mem);
 
     // Call the JIT-compiled function with two float arguments
-    double result = add_func(1.513, 3.0);
+    double result = add_func(1.5121312321333, 0.0200213131241);
     std::cout << "Result: " << result << std::endl;
 
     // Free the executable memory

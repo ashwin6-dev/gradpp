@@ -18,3 +18,5 @@ enum Register {
 void* allocate_executable_memory(size_t size, const uint8_t* code);
 uint8_t* add_doubles(Register source, Register dest);
 uint8_t* sub_doubles(Register source, Register dest);
+uint8_t* mul_doubles(Register source, Register dest);
+uint8_t* div_doubles(Register source, Register dest);
