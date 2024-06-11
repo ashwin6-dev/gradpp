@@ -4,6 +4,7 @@
 #include "placeholder.h"
 
 class Graph {
+    bool grad_graph = false;
     std::vector<Placeholder*> placeholders;
     std::vector<Node*> outputs;
 
@@ -13,6 +14,8 @@ public:
     std::vector<Placeholder*> get_placeholders();
     std::vector<double> evaluate(std::vector<double> inputs);
     Graph partials();
+    void set_grad_graph(bool is_grad);
+    bool is_grad_graph();
 };
 
 Graph make_graph(std::vector<Placeholder*> placeholders);

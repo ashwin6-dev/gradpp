@@ -15,6 +15,16 @@ void Graph::set_outputs(std::vector<Node*> outputs)
     this->outputs = outputs;
 }
 
+void Graph::set_grad_graph(bool is_grad)
+{
+    grad_graph = is_grad;
+}
+
+bool Graph::is_grad_graph()
+{
+    return grad_graph;
+}
+
 std::vector<Placeholder*> Graph::get_placeholders()
 {
     return placeholders;
@@ -43,6 +53,27 @@ Graph Graph::partials()
     Const* c = make_const(1.0);
     std::vector<Node*> grad_outputs;    
 
+    if (grad_graph) {
+        assert(placeholders.size() == outputs.size());
+
+        for (int i = 0; i < placeholders.size(); i++) {
+            Placeholder* placeholder = placeholders[i];
+            Node* output = outputs[i];
+
+            Node* partial_output = make_const(0.0);
+            Node* partial = output->partial(c, placeholder);
+            partial_output = add(partial_output, partial);
+
+            grad_outputs.push_back(partial_output);
+        }
+
+        Graph grad(placeholders);
+        grad.set_outputs(grad_outputs);
+        grad.set_grad_graph(true);
+
+        return grad;
+    }
+
     for (Placeholder* placeholder : placeholders) {
         Node* partial_output = make_const(0.0);
         for (Node* output : outputs) {
@@ -55,7 +86,8 @@ Graph Graph::partials()
 
     Graph grad(placeholders);
     grad.set_outputs(grad_outputs);
-    
+    grad.set_grad_graph(true);
+        
     return grad;
 }
 
