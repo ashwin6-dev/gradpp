@@ -13,3 +13,8 @@ Node* Node::partial(Node* incoming_gradient, Node* wrt)
 
     return make_const(0.0);
 }
+
+std::vector<Node*> Node::get_dependencies()
+{
+    return dependencies;
+}

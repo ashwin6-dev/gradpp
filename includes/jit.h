@@ -3,6 +3,7 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <cstdint>
+#include <vector>
 
 enum Register {
     XMM0,
@@ -15,8 +16,18 @@ enum Register {
     XMM7
 };
 
+enum Operation {
+    ADD,
+    SUB,
+    MUL,
+    DIV
+};
+
+typedef std::vector<uint8_t> instruction;
+typedef double (*graph_jit_func)(double, double);
+
 void* allocate_executable_memory(size_t size, const uint8_t* code);
-uint8_t* add_doubles(Register source, Register dest);
-uint8_t* sub_doubles(Register source, Register dest);
-uint8_t* mul_doubles(Register source, Register dest);
-uint8_t* div_doubles(Register source, Register dest);
+
+instruction emit_arithmetic_operation(Operation op, Register source, Register dest);
+instruction emit_move_operation(Register source, Register dest);
+graph_jit_func make_function(std::vector<instruction> instructions);

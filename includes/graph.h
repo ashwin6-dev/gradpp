@@ -12,6 +12,7 @@ public:
     Graph(std::vector<Placeholder*> placeholders);
     void set_outputs(std::vector<Node*> outputs);
     std::vector<Placeholder*> get_placeholders();
+    std::vector<Node*> get_outputs();
     std::vector<double> evaluate(std::vector<double> inputs);
     Graph partials();
     void set_grad_graph(bool is_grad);

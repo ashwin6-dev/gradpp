@@ -30,6 +30,11 @@ std::vector<Placeholder*> Graph::get_placeholders()
     return placeholders;
 }
 
+std::vector<Node*> Graph::get_outputs()
+{
+    return outputs;
+}
+
 std::vector<double> Graph::evaluate(std::vector<double> inputs)
 {
     assert(inputs.size() == placeholders.size());

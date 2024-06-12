@@ -8,4 +8,5 @@ protected:
 public:
     virtual double evaluate();
     virtual Node* partial(Node* incoming_gradient, Node* wrt);
+    std::vector<Node*> get_dependencies();
 };
