@@ -24,10 +24,11 @@ enum Operation {
 };
 
 typedef std::vector<uint8_t> instruction;
-typedef double (*graph_jit_func)(double, double);
+typedef double (*graph_jit_func)(double*);
 
 void* allocate_executable_memory(size_t size, const uint8_t* code);
 
 instruction emit_arithmetic_operation(Operation op, Register source, Register dest);
 instruction emit_move_operation(Register source, Register dest);
+instruction emit_move_placeholder_reg_operation(int placeholder_num, Register dest, uint8_t offset);
 graph_jit_func make_function(std::vector<instruction> instructions);

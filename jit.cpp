@@ -58,6 +58,26 @@ instruction emit_move_operation(Register source, Register dest)
     return code;
 }
 
+instruction emit_move_placeholder_reg_operation(int placeholder_num, Register dest)
+{
+    uint8_t prefix = 0xf2;
+    uint8_t opcode_prefix = 0x0f;
+    uint8_t opcode = 0x10;
+    uint8_t operands = (dest << 3) | 7; // rdi is 111
+    uint8_t mod = 1 << 6;
+
+    std::vector<uint8_t> code { 
+        0x48,
+        prefix,
+        opcode_prefix,
+        opcode,
+        static_cast<uint8_t>(mod | operands),
+        static_cast<uint8_t>(placeholder_num * sizeof(double))
+    };
+
+    return code;
+}
+
 graph_jit_func make_function(std::vector<instruction> instructions)
 {
     uint8_t* code = (uint8_t*) calloc(instructions.size(), 8);
@@ -81,15 +101,21 @@ int main() {
     // Cast the memory to a function pointer and call it
     graph_jit_func add_func = make_function(
         std::vector<instruction> { 
-            emit_arithmetic_operation(MUL, XMM1, XMM0),
-            emit_move_operation(XMM0, XMM2),
-            emit_arithmetic_operation(ADD, XMM1, XMM2),
-            emit_move_operation(XMM2, XMM0)
+            emit_move_placeholder_reg_operation(0, XMM0),
+            emit_move_placeholder_reg_operation(1, XMM1),
+            emit_move_placeholder_reg_operation(2, XMM2),
+            emit_arithmetic_operation(ADD, XMM1, XMM0),
+            emit_arithmetic_operation(MUL, XMM2, XMM0)
         }
     );
 
     // Call the JIT-compiled function with two float arguments
-    double result = add_func(2.0, 2.012937421);
+    double inputs[3];
+    inputs[0] = 2.0;
+    inputs[1] = 3.0;
+    inputs[2] = 5.5;
+
+    double result = add_func(inputs);
     std::cout << "Result: " << result << std::endl;
 
     // Free the executable memory
