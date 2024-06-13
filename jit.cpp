@@ -1,4 +1,5 @@
 #include "includes/jit.h"
+#include "includes/utils.h"
 
 void* allocate_executable_memory(size_t size, const uint8_t* code) 
 {
@@ -60,6 +61,7 @@ instruction emit_move_operation(Register source, Register dest)
 
 instruction emit_move_placeholder_reg_operation(int placeholder_num, Register dest)
 {
+    uint8_t REX = 0x48;
     uint8_t prefix = 0xf2;
     uint8_t opcode_prefix = 0x0f;
     uint8_t opcode = 0x10;
@@ -67,7 +69,7 @@ instruction emit_move_placeholder_reg_operation(int placeholder_num, Register de
     uint8_t mod = 1 << 6;
 
     std::vector<uint8_t> code { 
-        0x48,
+        REX,
         prefix,
         opcode_prefix,
         opcode,
@@ -97,6 +99,64 @@ graph_jit_func make_function(std::vector<instruction> instructions)
     return func;
 }
 
+
+std::vector<instruction> JITVisitor::visit(Node* node, register_allocation allocation) 
+{
+    return std::vector<instruction>();
+}
+
+std::vector<instruction> JITVisitor::visit(Placeholder* node, register_allocation allocation) 
+{
+    return std::vector<instruction>();
+}
+
+std::vector<instruction> JITVisitor::visit(Const* node, register_allocation allocation) 
+{
+    return std::vector<instruction>();
+}
+
+std::vector<instruction> JITVisitor::visit(Add* node, register_allocation allocation) 
+{
+    Node* left = node->get_left();
+    Node* right = node->get_right();
+
+    std::vector<instruction> left_instructions = visit(left, allocation);
+    std::vector<instruction> right_instructions = visit(right, allocation);
+    instruction add_instruction = emit_arithmetic_operation(ADD, allocation[left], allocation[right]);
+    std::vector<instruction> res = merge_vectors<instruction>(left_instructions, right_instructions);
+    res.push_back(add_instruction);
+
+    return res;
+}
+
+std::vector<instruction> JITVisitor::visit(Sub* node, register_allocation allocation) 
+{
+    Node* left = node->get_left();
+    Node* right = node->get_right();
+
+    std::vector<instruction> left_instructions = visit(left, allocation);
+    std::vector<instruction> right_instructions = visit(right, allocation);
+    instruction sub_instruction = emit_arithmetic_operation(SUB, allocation[left], allocation[right]);
+    std::vector<instruction> res = merge_vectors<instruction>(left_instructions, right_instructions);
+    res.push_back(sub_instruction);
+
+    return res;
+}
+
+std::vector<instruction> JITVisitor::visit(Mul* node, register_allocation allocation) 
+{
+    Node* left = node->get_left();
+    Node* right = node->get_right();
+
+    std::vector<instruction> left_instructions = visit(left, allocation);
+    std::vector<instruction> right_instructions = visit(right, allocation);
+    instruction mul_instruction = emit_arithmetic_operation(MUL, allocation[left], allocation[right]);
+    std::vector<instruction> res = merge_vectors<instruction>(left_instructions, right_instructions);
+    res.push_back(mul_instruction);
+
+    return res;
+}
+
 int main() {
     // Cast the memory to a function pointer and call it
     graph_jit_func add_func = make_function(
@@ -116,9 +176,7 @@ int main() {
     inputs[2] = 5.5;
 
     double result = add_func(inputs);
-    std::cout << "Result: " << result << std::endl;
-
-    // Free the executable memory
+    std::cout << "result: " << result << std::endl;
 
     return 0;
 }

@@ -2,10 +2,11 @@
 
 #include "graph.h"
 #include "node.h"
-#include "jit.h"
+#include "register.h"
 
 #include <bits/stdc++.h>
 
 typedef std::unordered_map<Node*, Register> register_allocation;
 
-register_allocation allocate_registers(Graph graph);
+Register inc_reg(Register reg);
+void allocate_registers(Graph graph, register_allocation &allocation);

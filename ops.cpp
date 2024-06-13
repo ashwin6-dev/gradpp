@@ -11,6 +11,16 @@ BinOp::BinOp(Node* left, Node* right)
     dependencies.push_back(right);
 }
 
+Node* BinOp::get_left()
+{
+    return left;
+}
+
+Node* BinOp::get_right()
+{
+    return right;
+}
+
 double Add::evaluate()
 {
     return left->evaluate() + right->evaluate();

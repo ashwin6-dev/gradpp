@@ -5,16 +5,14 @@
 #include <cstdint>
 #include <vector>
 
-enum Register {
-    XMM0,
-    XMM1,
-    XMM2,
-    XMM3,
-    XMM4,
-    XMM5,
-    XMM6,
-    XMM7
-};
+#include "graph.h"
+#include "register-allocator.h"
+#include "ops.h"
+#include "const.h"
+#include "register.h"
+
+typedef std::vector<uint8_t> instruction;
+typedef double (*graph_jit_func)(double*);
 
 enum Operation {
     ADD,
@@ -23,12 +21,21 @@ enum Operation {
     DIV
 };
 
-typedef std::vector<uint8_t> instruction;
-typedef double (*graph_jit_func)(double*);
+class JITVisitor {
+public:
+    std::vector<instruction> visit(Node* node, register_allocation allocation);
+    std::vector<instruction> visit(Placeholder* node, register_allocation allocation);
+    std::vector<instruction> visit(Const* node, register_allocation allocation);
+    std::vector<instruction> visit(Add* node, register_allocation allocation);
+    std::vector<instruction> visit(Sub* node, register_allocation allocation);
+    std::vector<instruction> visit(Mul* node, register_allocation allocation);
+};
 
 void* allocate_executable_memory(size_t size, const uint8_t* code);
 
 instruction emit_arithmetic_operation(Operation op, Register source, Register dest);
 instruction emit_move_operation(Register source, Register dest);
-instruction emit_move_placeholder_reg_operation(int placeholder_num, Register dest, uint8_t offset);
+instruction emit_move_placeholder_reg_operation(int placeholder_num, Register dest);
 graph_jit_func make_function(std::vector<instruction> instructions);
+
+graph_jit_func jit_graph(Graph graph);

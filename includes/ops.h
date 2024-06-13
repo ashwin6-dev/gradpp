@@ -9,6 +9,8 @@ protected:
 
 public:
     BinOp(Node* left, Node* right);
+    Node* get_left();
+    Node* get_right();
 };
 
 class Add : public BinOp {
