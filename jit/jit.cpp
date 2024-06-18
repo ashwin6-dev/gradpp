@@ -145,9 +145,9 @@ instruction emit_arithmetic_operation(Operation op, SIMDRegister dest, SIMDRegis
 int main()
 {
     std::vector<instruction> instructions {
-        emit_mov_double_literal(XMM1, 1.5),
+        emit_mov_double_literal(XMM1, 0.01),
         emit_mov_double_literal(XMM0, 2.1),
-        emit_arithmetic_operation(ADD, XMM0, XMM1)
+        emit_arithmetic_operation(DIV, XMM0, XMM1)
     };
 
     graph_jit_func func = make_function(instructions);
