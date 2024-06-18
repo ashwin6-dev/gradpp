@@ -54,6 +54,23 @@ std::vector<uint8_t> read_literal_bytes(uint64_t literal)
     return bytes;
 }
 
+/*
+Reads in 32-bit literal and returns it in LITTLE ENDIAN
+*/
+std::vector<uint8_t> read_literal_bytes(uint32_t literal)
+{
+    uint8_t last_byte = 0xff;
+    std::vector<uint8_t> bytes;
+
+    for (int i = 0; i < 4; i++) {
+        uint8_t byte = static_cast<uint8_t>(last_byte & literal);
+        bytes.push_back(byte);
+        literal >>= 8;
+    }
+
+    return bytes;
+}
+
 instruction emit_mov_literal(Register64 dest, uint64_t literal)
 {
     uint8_t rex_prefix = 0x48;
@@ -115,6 +132,27 @@ instruction emit_mov(Register64 dest, Register64 src)
     return instruction;
 }
 
+instruction emit_mov_addr(SIMDRegister dest, Register64 src, uint32_t displacement)
+{
+    uint8_t sse = 0x66;
+    uint8_t rex_prefix = 0x48;
+    uint8_t opcode_prefix = 0x0f;
+    uint8_t opcode = 0x6e;
+    uint8_t mod = 0x80 | (dest << 3) | src;
+    std::vector<uint8_t> displacement_bytes = read_literal_bytes(displacement);
+
+    std::vector<uint8_t> instruction {
+        sse,
+        rex_prefix,
+        opcode_prefix,
+        opcode,
+        mod
+    };
+
+    instruction.insert(instruction.end(), displacement_bytes.begin(), displacement_bytes.end());
+    return instruction;
+}
+
 instruction emit_arithmetic_operation(Operation op, SIMDRegister dest, SIMDRegister src) 
 {
     uint8_t prefix = 0xf2;
@@ -145,15 +183,16 @@ instruction emit_arithmetic_operation(Operation op, SIMDRegister dest, SIMDRegis
 int main()
 {
     std::vector<instruction> instructions {
-        emit_mov_double_literal(XMM1, 0.01),
-        emit_mov_double_literal(XMM0, 2.1),
-        emit_arithmetic_operation(DIV, XMM0, XMM1)
+        emit_mov_addr(XMM0, RDI, 8),
+        emit_mov_addr(XMM2, RDI, 0),
+        emit_arithmetic_operation(ADD, XMM0, XMM2),
     };
 
     graph_jit_func func = make_function(instructions);
 
     double inputs[1];
-    inputs[0] = 1.0;
+    inputs[0] = 1.123;
+    inputs[1] = 5.0;
 
     double res = func(inputs);
     
