@@ -9,20 +9,18 @@
 typedef std::vector<uint8_t> instruction;
 typedef double (*graph_jit_func)(double*);
 
+enum Operation {
+    ADD, SUB, MUL, DIV
+};
+
 enum Register64 {
     RAX, RCX, RDX, RBX, RSP, RBP, RSI, RDI,
     R8, R9, R10, R11, R12, R13, R14, R15,
 };
 
 enum SIMDRegister {
-    XMM0,
-    XMM1,
-    XMM2,
-    XMM3,
-    XMM4,
-    XMM5,
-    XMM6,
-    XMM7
+    XMM0, XMM1, XMM2, XMM3,
+    XMM4, XMM5, XMM6, XMM7
 };
 
 

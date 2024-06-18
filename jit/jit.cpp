@@ -14,7 +14,13 @@ void* allocate_executable_memory(size_t size, const uint8_t* code)
 
 graph_jit_func make_function(std::vector<instruction> instructions)
 {
-    uint8_t* code = (uint8_t*) calloc(instructions.size(), 8);
+    int total_size = 0;
+    for (instruction ins : instructions) {
+        total_size += ins.size();
+    }
+    total_size++;
+
+    uint8_t* code = (uint8_t*) calloc(total_size, 1);
     int code_index = 0;
 
     for (instruction ins : instructions) {
@@ -26,7 +32,6 @@ graph_jit_func make_function(std::vector<instruction> instructions)
     code[code_index++] = 0xc3;
 
     void* mem = allocate_executable_memory(code_index, code);
-    free(code);
     graph_jit_func func = reinterpret_cast<graph_jit_func>(mem);
 
     return func;
@@ -78,13 +83,14 @@ instruction emit_mov_double_literal(SIMDRegister dest, double literal)
 
 instruction emit_mov_simd(SIMDRegister dest, Register64 src)
 {
+    uint8_t sse = 0x66;
     uint8_t rex_prefix = 0x48;
     uint8_t opcode_prefix = 0x0f;
     uint8_t opcode = 0x6e;
     uint8_t mod = 0xc0 | (dest << 3) | src;
 
     std::vector<uint8_t> instruction {
-        0x66,
+        sse,
         rex_prefix,
         opcode_prefix,
         opcode,
@@ -98,7 +104,7 @@ instruction emit_mov(Register64 dest, Register64 src)
 {
     uint8_t rex_prefix = 0x48;
     uint8_t opcode = 0x8b;
-    uint8_t mod = 0xc0| (dest << 3) | src;
+    uint8_t mod = 0xc0 | (dest << 3) | src;
 
     std::vector<uint8_t> instruction {
         rex_prefix,
@@ -109,10 +115,39 @@ instruction emit_mov(Register64 dest, Register64 src)
     return instruction;
 }
 
+instruction emit_arithmetic_operation(Operation op, SIMDRegister dest, SIMDRegister src) 
+{
+    uint8_t prefix = 0xf2;
+    uint8_t opcode_prefix = 0x0f;
+    uint8_t opcode;
+    uint8_t mod = 0xc0 | dest << 3 | src;
+    
+    if (op == ADD) {
+        opcode = 0x58;
+    }else if (op == SUB) {
+        opcode = 0x5c;
+    }else if (op == MUL) {
+        opcode = 0x59;
+    }else if (op == DIV) {
+        opcode = 0x5e;
+    }
+
+    std::vector<uint8_t> instruction { 
+        prefix,
+        opcode_prefix,
+        opcode,
+        mod
+    };
+
+    return instruction;
+}
+
 int main()
 {
     std::vector<instruction> instructions {
-        emit_mov_double_literal(XMM0, 1.2)
+        emit_mov_double_literal(XMM1, 1.5),
+        emit_mov_double_literal(XMM0, 2.1),
+        emit_arithmetic_operation(ADD, XMM0, XMM1)
     };
 
     graph_jit_func func = make_function(instructions);
